@@ -218,6 +218,20 @@ code{font-family:var(--f-mono);font-size:.88em;background:var(--paper);padding:1
 .qcard{max-width:780px;margin:0 auto}
 .qhead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .qtext{font-size:1.18rem;font-weight:500;line-height:1.5;margin:6px 0 18px;text-wrap:pretty}
+.ctx{margin:-6px 0 18px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.review-item .ctx{margin:6px 0 10px}
+.ctx-scroll{overflow-x:auto}
+.ctx table{border-collapse:collapse;font-family:var(--f-mono);font-size:.9rem;font-variant-numeric:tabular-nums}
+.ctx table.cm th,.ctx table.cm td{border:1px solid var(--line-strong);padding:7px 14px;text-align:center;white-space:nowrap}
+.ctx table.cm th{font-family:var(--f-body);font-weight:600;font-size:.84rem;background:var(--sheet)}
+.ctx table.cm tr:first-child th:first-child{background:transparent;border-color:transparent transparent var(--line-strong) transparent}
+.ctx table.cm td{background:var(--sheet)}
+.ctx table.cgrid td{border:1.5px solid var(--line-strong);width:118px;height:84px;text-align:center;vertical-align:middle;background:var(--sheet)}
+.ctx table.cgrid td b{display:block;font-size:1.05rem;color:var(--accent)}
+.ctx table.cgrid td span{display:block;font-size:.8rem;color:var(--muted)}
+.ctx table.cgrid td .dim{font-size:1rem}
+.ctx-note{font-size:.8rem;color:var(--muted);margin-top:8px}
+@media (max-width:560px){.ctx{padding:10px}.ctx table{font-size:.82rem}.ctx table.cm th,.ctx table.cm td{padding:6px 6px;white-space:normal}.ctx table.cm th{font-size:.74rem;hyphens:auto}.ctx table.cgrid td{width:96px;height:76px}}
 .opts{display:flex;flex-direction:column;gap:10px}
 .opt{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;text-align:left;border:1px solid var(--line-strong);background:var(--sheet);border-radius:10px;padding:12px 14px;cursor:pointer;line-height:1.45}
 .opt:hover:not([disabled]){border-color:var(--ink)}
@@ -1215,6 +1229,7 @@ lab2: [
 
 // a[0] is always the correct answer; options are shuffled at render time.
 // Options are kept similar in length and style so the answer cannot be guessed from its form.
+// ctx (optional) = HTML context (tables, grids) shown with the question.
 const QUIZ = {
 u1: [
  {"q":"Which feature most clearly distinguishes a GIS from a database management system (DBMS)?","a":["It handles spatially explicit data","It stores large attribute tables","It supports SQL-style queries","It produces printed map output"],"e":"A GIS differs from a DBMS because it handles spatially explicit data. It differs from CAD because it performs spatial operations, and from computer cartography because of its analytical capacity."},
@@ -1236,8 +1251,8 @@ u2: [
  {"q":"Repeated GPS readings cluster tightly together but are all offset 12 m from the surveyed benchmark. The data are:","a":["Precise but not accurate","Accurate but not precise","Both accurate and precise","Neither precise nor accurate"],"e":"Tight clustering = precise; offset from truth = inaccurate. Points to a systematic error such as a wrong datum or calibration."},
  {"q":"Producer's accuracy is inversely related to:","a":["Errors of omission","Errors of commission","Chance agreement","Positional error"],"e":"Producer's accuracy = correct ÷ observed (column) total. It reflects reference samples that were missed (omitted) from their class."},
  {"q":"User's accuracy is calculated as:","a":["Correct samples of a class ÷ total predicted (row) for that class","Correct samples of a class ÷ total observed (column) for that class","Total correct ÷ total samples","Total correct ÷ number of classes"],"e":"User's accuracy uses the predicted (map) total, so it reflects errors of commission."},
- {"q":"Matrix (rows predicted, columns observed): Pred A: 40, 10; Pred B: 20, 30. What is the overall accuracy?","a":["70%","80%","66.7%","75%"],"e":"(40 + 30) / 100 = 70%."},
- {"q":"Using the same matrix (Pred A: 40, 10; Pred B: 20, 30), what is the producer's accuracy for class A?","a":["66.7%","80.0%","70.0%","60.0%"],"e":"Observed A column total = 40 + 20 = 60. PA_A = 40/60 = 66.7%. (User's accuracy for A = 40/50 = 80%.)"},
+ {"q":"A land-cover map was checked against 100 reference samples, giving the error matrix below. What is the overall accuracy?","a":["70%","80%","66.7%","75%"],"e":"Overall accuracy = diagonal ÷ total = (40 + 30) / 100 = 70%.","ctx":"<div class=\"ctx-scroll\"><table class=\"cm\"><tr><th></th><th>Observed A</th><th>Observed B</th></tr><tr><th>Predicted A</th><td>40</td><td>10</td></tr><tr><th>Predicted B</th><td>20</td><td>30</td></tr></table></div><div class=\"ctx-note\">Rows = predicted (map) class · Columns = observed (reference) class</div>"},
+ {"q":"Using the error matrix below, what is the producer's accuracy for class A?","a":["66.7%","80.0%","70.0%","60.0%"],"e":"Producer's accuracy uses the observed (column) total. Observed A = 40 + 20 = 60, so PA_A = 40/60 = 66.7%. (User's accuracy for A uses the row total: 40/50 = 80%.)","ctx":"<div class=\"ctx-scroll\"><table class=\"cm\"><tr><th></th><th>Observed A</th><th>Observed B</th></tr><tr><th>Predicted A</th><td>40</td><td>10</td></tr><tr><th>Predicted B</th><td>20</td><td>30</td></tr></table></div><div class=\"ctx-note\">Rows = predicted (map) class · Columns = observed (reference) class</div>"},
  {"q":"The Kappa Index of Agreement improves on overall accuracy by:","a":["Accounting for agreement expected by chance","Weighting large classes more heavily than small ones","Combining positional error with attribute error","Using the off-diagonal cells instead of the diagonal"],"e":"KIA measures classification accuracy while accounting for chance agreement."},
  {"q":"Which statistic is appropriate for assessing error in a continuous (interval/ratio) attribute such as elevation?","a":["RMSE","Kappa","Producer's accuracy","Overall accuracy from a confusion matrix"],"e":"A confusion matrix is impractical for continuous values; RMSE is used."},
  {"q":"Why does RMSE penalize large outliers more than 2D MAE?","a":["Errors are squared before averaging","It divides the sum by n − 1 instead of n","It ignores direction and uses absolute values","It measures the larger of Δx and Δy per point"],"e":"Squaring makes large errors disproportionately large. Using absolute values describes MAE, which is less sensitive to outliers."},
@@ -1302,13 +1317,13 @@ u5: [
  {"q":"Geodesic distance is most appropriate when:","a":["Features span multiple UTM zones or large regions","Data are in a projected system over a small area","Travel follows a grid of city streets or blocks","Raster buffers are built at a fine cell size"],"e":"Geodesic distance accounts for the ellipsoid; Euclidean suits small projected areas."},
  {"q":"Manhattan distance from (2, 3) to (7, 9) is:","a":["11","7.81","5","30"],"e":"|7−2| + |9−3| = 5 + 6 = 11. (Euclidean = √61 ≈ 7.81.)"},
  {"q":"Each cell of a cost (friction) surface represents:","a":["Cost of crossing one unit of distance in that cell","Total cost of travel from the source to that cell","Direction to the next cell on the cheapest path","Elevation of the cell used to compute the slope"],"e":"The accumulated surface holds totals; the back-link holds directions."},
- {"q":"Cell i has accumulated cost 20 and cost value 6. Orthogonal neighbour j has cost 4. Accumulated cost of j via i:","a":["25","30","27.07","22"],"e":"20 + (6 + 4)/2 = 25."},
- {"q":"Same cells but j is a diagonal neighbour (aᵢ = 20, costᵢ = 6, costⱼ = 4). Accumulated cost of j:","a":["27.07","25","34.14","30"],"e":"20 + 1.414 × (6 + 4)/2 = 20 + 7.07 = 27.07."},
+ {"q":"Cell i has an accumulated cost of 20 and a cost value of 6. Its orthogonal (side) neighbour j has a cost value of 4, as shown below. What is the accumulated cost of j when reached from i?","a":["25","30","27.07","22"],"e":"Orthogonal move: aⱼ = aᵢ + (costᵢ + costⱼ)/2 = 20 + (6 + 4)/2 = 25.","ctx":"<div class=\"ctx-scroll\"><table class=\"cgrid\"><tr><td><b>i</b><span>cost 6</span><span>accum. 20</span></td><td><b>j</b><span>cost 4</span><span>accum. ?</span></td></tr><tr><td><span class=\"dim\">·</span></td><td><span class=\"dim\">·</span></td></tr></table></div><div class=\"ctx-note\">Cells are 1 unit apart, centre to centre</div>"},
+ {"q":"Cell i has an accumulated cost of 20 and a cost value of 6. Its diagonal neighbour j has a cost value of 4, as shown below. What is the accumulated cost of j when reached from i?","a":["27.07","25","34.14","30"],"e":"Diagonal neighbours are √2 ≈ 1.414 units apart: aⱼ = 20 + 1.414 × (6 + 4)/2 = 20 + 7.07 = 27.07.","ctx":"<div class=\"ctx-scroll\"><table class=\"cgrid\"><tr><td><b>i</b><span>cost 6</span><span>accum. 20</span></td><td><span class=\"dim\">·</span></td></tr><tr><td><span class=\"dim\">·</span></td><td><b>j</b><span>cost 4</span><span>accum. ?</span></td></tr></table></div><div class=\"ctx-note\">Cells are 1 unit apart orthogonally, centre to centre</div>"},
  {"q":"What is the purpose of the back-link (back direction) raster?","a":["To trace the cheapest route back to the source","To store the per-unit travel cost of each cell","To mark which cells act as absolute barriers","To normalize cost factors onto a common scale"],"e":"It encodes each cell's discovering neighbour, the next step toward the source."},
  {"q":"The least-cost path is traced on the accumulated cost surface by:","a":["Steepest descent from the target to the source","Steepest ascent from the source to the target","Following the cells with the highest cost","A straight line from the source to the target"],"e":"Sources are the lowest points (0) on the accumulation surface."},
  {"q":"Cost allocation only makes sense when:","a":["There is more than one source","There is a single source","The cost surface is uniform","Distances are geodesic"],"e":"Allocation assigns each cell to its least-cost source (area of capture)."},
  {"q":"Why are single-cell-wide streams often thickened with a 3×3 maximum filter before building a cost surface?","a":["To stop paths slipping diagonally through them","To reduce the file size of the cost raster","To prepare streams for conversion to vectors","To remove small streams from the cost surface"],"e":"Diagonal connectivity can let a path cross between two diagonally adjacent barrier cells."},
- {"q":"In the highway example, why weren't the cost factors normalized?","a":["All factors were already in the same units ($/m)","Normalization only applies to MCE suitability","There was only one factor in the cost surface","The DEM handled the scaling automatically"],"e":"A common objective measure ($) already accounts for relative importance."},
+ {"q":"A cost surface for a new road between two highways was built from the factors below. Why weren't these factors normalized to a common scale before they were combined?","a":["All factors were already in the same units","Normalization only applies to MCE suitability","There was only one factor in the cost surface","The DEM handled the scaling automatically"],"e":"Every factor is already a cost in $/m, a common objective unit, so they can be added directly and their relative importance is built in.","ctx":"<div class=\"ctx-scroll\"><table class=\"cm\"><tr><th>Factor</th><th>Cost</th></tr><tr><th>Privately owned land</th><td>$100,000 / m</td></tr><tr><th>Small stream (culvert)</th><td>$500 / m</td></tr><tr><th>Medium stream (small bridge)</th><td>$5,000–10,000 / m</td></tr><tr><th>Large river</th><td>$1,000,000 / m</td></tr><tr><th>Wetland</th><td>$1,000,000 / m</td></tr><tr><th>Slope 0–5° / 5–10° / 10–15°</th><td>$1,000 / $2,000 / $3,000 per m</td></tr><tr><th>Slope > 15°</th><td>$100,000 / m</td></tr></table></div>"},
  {"q":"Which is the correct order of LCPA steps?","a":["Cost surface → sources → accumulation + back-link → path","Sources → path → cost surface → accumulation + back-link","Accumulation + back-link → cost surface → path → sources","Cost surface → accumulation + back-link → sources → path"],"e":"Build the cost surface, specify sources/targets, run cost accumulation (with back-link), then trace the path. Accumulation needs the sources first."},
  {"q":"Wetlands that should be avoided if possible, but not strictly prohibited, are best treated as:","a":["High but passable cost values","An absolute barrier or mask","Source cells for accumulation","Zero cost so paths use them"],"e":"Absolute barriers get prohibitive costs or masks; soft constraints get high but passable costs."},
  {"q":"Which is NOT a typical application of least-cost path analysis?","a":["Calculating NDVI","Pipeline routing","Wildlife corridor connectivity","Recreational trail planning"],"e":"NDVI is a raster band ratio."},
@@ -1357,8 +1372,8 @@ lab2: [
  {"q":"Distance from existing campsites was transformed with:","a":["Large","Small","Near","Gaussian"],"e":"Farther is better, so larger values get higher scores."},
  {"q":"The 'Snap raster' environment setting:","a":["Aligns output cells to another raster's grid","Sets cells outside the study area to NoData","Defines the cell size of every output raster","Sets the coordinate system of every output"],"e":"Mask sets NoData outside an area; cell size sets resolution."},
  {"q":"Why does the lab recommend weighting by percent rather than multiplier?","a":["Multipliers overstate differences in imprecise data","Multiplier weights must add up to 1","Percent weights let the model ignore constraints","The multiplier option conflicts with the mask"],"e":"The multiplier exaggerates contrast among the top areas, adding artificial emphasis to inherently imprecise data. Suitability models are a first pass."},
- {"q":"Using the lab's pairwise table (Slope, Elevation, Proximity), which criterion receives the highest weight?","a":["Elevation (≈0.557)","Slope (≈0.320)","Proximity to campsites (≈0.123)","Slope and elevation (tied, ≈0.44)"],"e":"Normalize columns, average rows: Elevation ≈ 0.557, Slope ≈ 0.320, Proximity ≈ 0.123."},
- {"q":"The water cost was set greater than √(columns² + rows²) because:","a":["Entering water then costs more than any land route","It equals the total number of cells in the raster","It makes the slope costs irrelevant to the path","Distance Accumulation requires this exact value"],"e":"The diagonal is the longest straight path. At ~1 per land cell, any all-land route is cheaper than entering a single water cell."},
+ {"q":"Using the Lab 2 pairwise comparison matrix below, which criterion receives the highest weight?","a":["Elevation","Slope","Proximity to campsites","Slope and elevation tie"],"e":"Column sums: Slope 3.333, Elevation 1.75, Proximity 8. Normalize each column and average each row: Elevation ≈ 0.557, Slope ≈ 0.320, Proximity ≈ 0.123.","ctx":"<div class=\"ctx-scroll\"><table class=\"cm\"><tr><th></th><th>Slope</th><th>Elevation</th><th>Proximity to campsites</th></tr><tr><th>Slope</th><td>1</td><td>1/2</td><td>3</td></tr><tr><th>Elevation</th><td>2</td><td>1</td><td>4</td></tr><tr><th>Proximity to campsites</th><td>1/3</td><td>1/4</td><td>1</td></tr></table></div><div class=\"ctx-note\">Each cell = how much more important the row criterion is than the column criterion</div>"},
+ {"q":"In Lab 2 the trail cost surface was Cost_Slope (land cells cost 1–8) plus Cost_Waterbodies (land = 1, water = one very high value). The water value was set greater than √(columns² + rows²), the number of cells on the raster's diagonal. Why?","a":["Entering water then costs more than any land route","It equals the total number of cells in the raster","It makes the slope costs irrelevant to the path","Distance Accumulation requires this exact value"],"e":"The diagonal is the longest straight path. At ~1 per land cell, any all-land route is cheaper than entering a single water cell."},
  {"q":"A raster has 300 columns and 400 rows. The number of cells on its diagonal is:","a":["500","700","350","120,000"],"e":"√(300² + 400²) = √250,000 = 500."},
  {"q":"Which two rasters does Optimal Path As Line require from the Distance Accumulation step?","a":["Accumulated cost raster and back direction raster","Cost surface raster and the suitability raster","Elevation raster and the percent slope raster","Mask raster and the snap raster environment"],"e":"Accumulation gives totals; back direction gives the path."},
  {"q":"A reason NOT to dilate the waterbodies raster before least-cost routing is that:","a":["It can close narrow land bridges between lakes","It would make water cheaper for paths to cross","It would let paths leak diagonally between cells","It would lower the resolution of the cost raster"],"e":"Dilation is useful for preventing diagonal leakage, but it can close narrow land bridges and remove valid routes."},
@@ -1376,7 +1391,10 @@ const FILL = [
  {cat:"u2", q:"Errors of commission are inversely related to ____'s accuracy.", ans:["user","users","user's"], e:"User's accuracy = correct ÷ predicted (row) total."},
  {cat:"u2", q:"Prediction errors at four sample points are 3, −4, 0 and 5. The RMSE is ____ (2 decimal places).", num:3.54, tol:0.015, e:"Squares: 9 + 16 + 0 + 25 = 50. 50/4 = 12.5. √12.5 = 3.54."},
  {cat:"u2", q:"Two checkpoints have positional offsets (Δx, Δy) of (3 m, 4 m) and (6 m, 8 m). The horizontal RMSE is ____ m (2 decimal places).", num:7.91, tol:0.015, e:"(9+16) + (36+64) = 125. 125/2 = 62.5. √62.5 = 7.91 m."},
- {cat:"u2", q:"An error matrix has 76 samples, 61 on the diagonal, and Σ(row total × column total) = 1925. Kappa = ____ (3 decimal places).", num:0.704, tol:0.002, e:"(76×61 − 1925)/(76² − 1925) = 2711/3851 = 0.704."},
+ {cat:"u2", q:"Using the error matrix below, calculate the Kappa coefficient of agreement (3 decimal places).", ctx:"<div class=\"ctx-scroll\"><table class=\"cm\"><tr><th></th><th>Obs. Urban</th><th>Obs. Forest</th><th>Obs. Agriculture</th></tr><tr><th>Pred. Urban</th><td>22</td><td>2</td><td>2</td></tr><tr><th>Pred. Forest</th><td>2</td><td>19</td><td>2</td></tr><tr><th>Pred. Agriculture</th><td>3</td><td>4</td><td>20</td></tr></table></div><div class=\"ctx-note\">Rows = predicted (map) class · Columns = observed (reference) class</div>", num:0.704, tol:0.002, e:"N = 76; correct (diagonal) = 22 + 19 + 20 = 61; Σ(row total × column total) = 26×27 + 23×25 + 27×24 = 1925. κ = (76×61 − 1925)/(76² − 1925) = 2711/3851 = 0.704."},
+ {cat:"u2", q:"Using the error matrix below, what is the user's accuracy for Forest? (percent, 1 decimal place)", ctx:"<div class=\"ctx-scroll\"><table class=\"cm\"><tr><th></th><th>Obs. Urban</th><th>Obs. Forest</th><th>Obs. Agriculture</th></tr><tr><th>Pred. Urban</th><td>22</td><td>2</td><td>2</td></tr><tr><th>Pred. Forest</th><td>2</td><td>19</td><td>2</td></tr><tr><th>Pred. Agriculture</th><td>3</td><td>4</td><td>20</td></tr></table></div><div class=\"ctx-note\">Rows = predicted (map) class · Columns = observed (reference) class</div>", num:82.6, tol:0.06, e:"User's accuracy uses the predicted (row) total: Forest row = 2 + 19 + 2 = 23. UA = 19/23 = 82.6%."},
+ {cat:"u2", q:"Using the error matrix below, what is the producer's accuracy for Agriculture? (percent, 1 decimal place)", ctx:"<div class=\"ctx-scroll\"><table class=\"cm\"><tr><th></th><th>Obs. Urban</th><th>Obs. Forest</th><th>Obs. Agriculture</th></tr><tr><th>Pred. Urban</th><td>22</td><td>2</td><td>2</td></tr><tr><th>Pred. Forest</th><td>2</td><td>19</td><td>2</td></tr><tr><th>Pred. Agriculture</th><td>3</td><td>4</td><td>20</td></tr></table></div><div class=\"ctx-note\">Rows = predicted (map) class · Columns = observed (reference) class</div>", num:83.3, tol:0.06, e:"Producer's accuracy uses the observed (column) total: Agriculture column = 2 + 2 + 20 = 24. PA = 20/24 = 83.3%."},
+ {cat:"u2", q:"Using the error matrix below, what is the overall accuracy? (percent, 1 decimal place)", ctx:"<div class=\"ctx-scroll\"><table class=\"cm\"><tr><th></th><th>Obs. Urban</th><th>Obs. Forest</th><th>Obs. Agriculture</th></tr><tr><th>Pred. Urban</th><td>22</td><td>2</td><td>2</td></tr><tr><th>Pred. Forest</th><td>2</td><td>19</td><td>2</td></tr><tr><th>Pred. Agriculture</th><td>3</td><td>4</td><td>20</td></tr></table></div><div class=\"ctx-note\">Rows = predicted (map) class · Columns = observed (reference) class</div>", num:80.3, tol:0.11, e:"(22 + 19 + 20)/76 = 61/76 = 80.3% (the lecture slide rounds this to 80.2%)."},
  {cat:"u2", q:"At a map scale of 1:50,000, 1 cm on the map represents ____ m on the ground.", num:500, tol:0, e:"50,000 cm = 500 m."},
  {cat:"u2", q:"The MAUP effect seen when unit size stays the same but the shape of the units changes is the ____ effect.", ans:["zone","zoning","zonal"], e:"Zone (zoning) effect. Changing unit size is the scale effect."},
  {cat:"u2", q:"Inferring individual characteristics from aggregated group data is called the ____ fallacy.", ans:["ecological"], e:"Ecological fallacy."},
@@ -1741,7 +1759,8 @@ document.addEventListener("keydown", e => {
 
 /* ---------- QUIZZES ---------- */
 const QZ = {run: null};
-function makeMC(item, cat){ return {cat, q: item.q, e: item.e, opts: shuffle(item.a.map((t, k) => ({t, ok: k === 0})))}; }
+const ctxHTML = q => q.ctx ? `<div class="ctx">${q.ctx}</div>` : "";
+function makeMC(item, cat){ return {cat, q: item.q, ctx: item.ctx, e: item.e, opts: shuffle(item.a.map((t, k) => ({t, ok: k === 0})))}; }
 function startQuiz(cat){
   let qs;
   if(cat === "mixed"){ const all = []; CATS.forEach(c => QUIZ[c.id].forEach(x => all.push(makeMC(x, c.id)))); qs = shuffle(all).slice(0, 20); }
@@ -1784,7 +1803,7 @@ function renderQuiz(opts){
         <div class="row" style="margin-top:12px"><button class="btn primary" id="qzRetry">Retake (reshuffled)</button><button class="btn" id="qzBack">All quizzes</button>${r.cat !== "mixed" ? `<button class="btn ghost" data-go="read" data-arg="${r.cat}">Read ${CAT[r.cat].code} notes</button>` : ""}</div>
       </div>
       ${missed.length ? `<h2 style="font-size:1.1rem;margin:24px 0 4px">Questions to revisit (${missed.length})</h2>
-      <div class="review-list">${missed.map(o => { const pick = o.q.opts[r.picks[o.i]], right = o.q.opts.find(x => x.ok); return `<div class="review-item no"><div class="small">${sw(o.q.cat)} ${CAT[o.q.cat].code}</div><p><b>${esc(o.q.q)}</b></p><p class="small">Your answer: ${esc(pick ? pick.t : "—")}</p><p>Correct: <b>${esc(right.t)}</b></p><p class="small">${esc(o.q.e)}</p></div>`; }).join("")}</div>` : `<p style="margin-top:20px">No misses. Every question correct.</p>`}
+      <div class="review-list">${missed.map(o => { const pick = o.q.opts[r.picks[o.i]], right = o.q.opts.find(x => x.ok); return `<div class="review-item no"><div class="small">${sw(o.q.cat)} ${CAT[o.q.cat].code}</div><p><b>${esc(o.q.q)}</b></p>${ctxHTML(o.q)}<p class="small">Your answer: ${esc(pick ? pick.t : "—")}</p><p>Correct: <b>${esc(right.t)}</b></p><p class="small">${esc(o.q.e)}</p></div>`; }).join("")}</div>` : `<p style="margin-top:20px">No misses. Every question correct.</p>`}
     </div>`;
     $("#qzRetry").addEventListener("click", () => startQuiz(r.cat));
     $("#qzBack").addEventListener("click", () => { QZ.run = null; renderQuiz({}); });
@@ -1799,7 +1818,7 @@ function renderQuiz(opts){
     <div style="margin-bottom:14px">${scalebar(r.i / r.qs.length, Math.min(r.qs.length, 20))}<div class="scale-labels"><span>Q${r.i + 1}</span><span>${r.qs.length}</span></div></div>
     <div class="sheet pad">
       ${r.cat === "mixed" ? `<div class="small">${sw(q.cat)} ${CAT[q.cat].code}</div>` : ""}
-      <p class="qtext">${esc(q.q)}</p>
+      <p class="qtext">${esc(q.q)}</p>${ctxHTML(q)}
       <div class="opts">${q.opts.map((o, k) => { let cls = "opt"; if(answered){ if(o.ok) cls += " right"; else if(k === pick) cls += " wrong"; } return `<button class="${cls}" data-k="${k}" ${answered ? "disabled" : ""}><span class="let">${LET[k]}</span><span>${esc(o.t)}</span></button>`; }).join("")}</div>
       ${answered ? `<div class="explain ${correct ? "ok" : "no"}"><b class="${correct ? "v-ok" : "v-no"}">${correct ? "Correct." : "Not quite."}</b> ${esc(q.e)}</div>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn primary" id="qzNext">${r.i === r.qs.length - 1 ? "See results" : "Next question"} →</button></div>` : ""}
@@ -1827,7 +1846,7 @@ function buildExam(){
   let mc = []; CATS.forEach(c => { const p = shuffle(all.filter(o => o.cat === c.id)); mc.push(p[0]); });
   mc = shuffle(mc.concat(shuffle(all.filter(o => !mc.includes(o))).slice(0, 4)));
   const qs = [];
-  mc.forEach(o => { const m = makeMC(o.x, o.cat); qs.push({type: "mc", part: 1, cat: o.cat, q: m.q, e: m.e, opts: m.opts}); });
+  mc.forEach(o => { const m = makeMC(o.x, o.cat); qs.push({type: "mc", part: 1, cat: o.cat, q: m.q, ctx: m.ctx, e: m.e, opts: m.opts}); });
   pickDistinct(FILL, 6).forEach(f => qs.push(Object.assign({type: "fill", part: 2}, f)));
   shuffle(MATCH).slice(0, 2).forEach(m => qs.push({type: "match", part: 2, cat: m.cat, q: m.q, pairs: m.pairs, rights: shuffle(m.pairs.map(p => p[1]))}));
   pickDistinct(SHORT, 4).forEach(s => qs.push(Object.assign({type: "short", part: 3}, s)));
@@ -1968,7 +1987,7 @@ function renderExamQuestion(el){
     </aside>
     <div class="sheet pad" style="min-width:0">
       <div class="qhead"><div class="part-label">Part ${q.part} · ${q.type === "mc" ? "Multiple choice" : q.type === "fill" ? "Fill in the blank" : q.type === "match" ? "Matching" : "Short answer"}</div><span class="mono small">Question ${i + 1} of ${n} · ${PTS[q.type]} pt${PTS[q.type] > 1 ? "s" : ""}</span></div>
-      <p class="qtext">${esc(q.q)}</p>
+      <p class="qtext">${esc(q.q)}</p>${ctxHTML(q)}
       ${body}
       <div class="qnav">
         <button class="btn" id="exPrev" ${i === 0 ? "disabled" : ""}>← Previous</button>
@@ -2047,7 +2066,7 @@ function reviewItem(q, i){
   if(q.type === "short"){
     const got = EX.self[i].filter(Boolean).length;
     return `<div class="review-item ${got === 3 ? "ok" : got === 0 ? "no" : "part"}" id="sa-${i}">${head}<span class="pill fl" id="sap-${i}">${got} / 3</span></div>
-      <p><b>${esc(q.q)}</b></p>
+      <p><b>${esc(q.q)}</b></p>${ctxHTML(q)}
       <div class="small">Your answer</div><div class="yours">${a && a.trim() ? esc(a) : '<span class="small">No answer given.</span>'}</div>
       <div class="small">Model answer</div><div class="model">${esc(q.model)}</div>
       <div class="small">Tick each key point your answer covered (1 pt each)</div>
@@ -2057,11 +2076,11 @@ function reviewItem(q, i){
   const cls = got === max ? "ok" : got === 0 ? "no" : "part";
   const pill = `<span class="pill ${got === max ? "ok" : got === 0 ? "no" : "fl"}">${fmt(got)} / ${max}</span></div>`;
   if(q.type === "match"){
-    return `<div class="review-item ${cls}">${head}${pill}<p><b>${esc(q.q)}</b></p>
+    return `<div class="review-item ${cls}">${head}${pill}<p><b>${esc(q.q)}</b></p>${ctxHTML(q)}
       <table class="match">${q.pairs.map((p, k) => `<tr><td>${esc(p[0])}</td><td>${a[k] === p[1] ? `<span style="color:var(--ok)">✓ ${esc(p[1])}</span>` : `<span style="color:var(--bad)">${a[k] ? "✗ " + esc(a[k]) : "✗ (blank)"}</span><br><span class="small">Correct: ${esc(p[1])}</span>`}</td></tr>`).join("")}</table></div>`;
   }
   const right = q.type === "mc" ? q.opts.find(o => o.ok).t : (q.num != null ? String(q.num) : q.ans[0]);
-  return `<div class="review-item ${cls}">${head}${pill}<p><b>${esc(q.q)}</b></p>
+  return `<div class="review-item ${cls}">${head}${pill}<p><b>${esc(q.q)}</b></p>${ctxHTML(q)}
     <p class="small">Your answer: ${esc(answerText(q, a))}</p>
     ${got === max ? "" : `<p>Correct: <b>${esc(right)}</b></p>`}
     <p class="small">${esc(q.e)}</p></div>`;
